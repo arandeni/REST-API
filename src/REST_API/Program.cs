@@ -1,4 +1,6 @@
 
+using Microsoft.OpenApi.Models;
+
 namespace REST_API
 {
     public class Program
@@ -12,7 +14,27 @@ namespace REST_API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("V10", new OpenApiInfo
+                {
+                    Title = "My Custom API",
+                    Version = "V10",
+                    Description = "A Brief Description of My APIs",
+                    TermsOfService = new Uri("https://dotnettutorials.net/privacy-policy/"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Support",
+                        Email = "support@dotnettutorials.net",
+                        Url = new Uri("https://dotnettutorials.net/contact/")
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use Under XYZ",
+                        Url = new Uri("https://dotnettutorials.net/about-us/")
+                    }
+                });
+            });
 
             var app = builder.Build();
 
@@ -20,7 +42,10 @@ namespace REST_API
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/V10/swagger.json", "My API V10");
+                });
             }
 
             app.UseHttpsRedirection();
@@ -29,6 +54,9 @@ namespace REST_API
 
 
             app.MapControllers();
+            app.MapControllerRoute(
+            name: "default",
+            pattern: "api/{controller}/{action}/{id?}");
 
             app.Run();
         }
